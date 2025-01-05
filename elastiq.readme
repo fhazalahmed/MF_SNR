@@ -1,0 +1,53 @@
+# OpenSearch Hosting on GKE with Operator - README
+
+## Objective:
+This solution deploys an OpenSearch cluster in Google Kubernetes Engine (GKE) using the OpenSearch Operator. It follows Kubernetes best practices, uses GKE Autopilot for management, and integrates secure identity management through GCP Workload Identity. This setup avoids using static credentials and optimizes for security and cost efficiency.
+
+## Prerequisites:
+1. **Google Cloud Project**: Ensure you have a GCP project with sufficient permissions to create GKE clusters, IAM roles, and service accounts.
+2. **Terraform**: Ensure Terraform is installed and configured to interact with your GCP account.
+3. **Kubernetes CLI (kubectl)**: Ensure `kubectl` is installed to interact with your GKE cluster.
+4. **GCP Credentials**: You must have a service account with the appropriate permissions and access to GKE resources.
+
+## Terraform Files:
+The following Terraform files are used to create the required infrastructure:
+- **`variables.tf`**: Defines the variables for the configuration.
+- **`terraform.tfvars`**: Contains the values for the variables.
+- **`main.tf`**: The main Terraform configuration file for setting up GKE, VPC, subnets, and IAM.
+- **`outputs.tf`**: Outputs key information like VPC, subnets, and GKE cluster details.
+
+### Steps to Deploy:
+
+### 1. Set Up GKE Autopilot Cluster
+
+- **Terraform Configuration**: The provided Terraform code creates a GKE Autopilot cluster in your Google Cloud project. It automatically provisions a custom VPC and subnets for the cluster, which gives you more control over networking.
+- **Workload Identity**: The code configures GKE Workload Identity, allowing Kubernetes workloads to access GCP resources securely without using static credentials.
+
+To deploy the cluster:
+   - Update the Terraform configuration with your GCP project and service account details.
+   - Run the following Terraform commands:
+     ```bash
+     terraform init
+     terraform apply
+     ```
+
+### 2. Deploy OpenSearch Operator
+
+- Once the GKE Autopilot cluster is set up, you'll need to install the OpenSearch Operator in your Kubernetes cluster. This can be done by applying Kubernetes manifests to deploy the Operator and associated CRDs (Custom Resource Definitions).
+
+   **Steps to install the Operator**:
+   1. Clone the OpenSearch Operator repository or get the necessary manifests from the official OpenSearch GitHub repository.
+   2. Apply the CRDs:
+      ```bash
+      kubectl apply -f opensearch-operator-crds.yaml
+      ```
+   3. Install the Operator:
+      ```bash
+      kubectl apply -f opensearch-operator-deployment.yaml
+      ```
+
+### 3. Deploy OpenSearch Cluster
+
+- Define the OpenSearch cluster specification in a Kubernetes manifest (e.g., `opensearch-cluster.yaml`), and apply it to the cluster:
+  ```bash
+  kubectl apply -f opensearch-cluster.yaml
